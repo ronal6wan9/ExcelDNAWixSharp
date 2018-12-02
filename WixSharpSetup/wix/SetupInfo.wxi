@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+  <!--START: check content and replace by yours-->
+
+  <!-- Constants -->
+  <!-- THIS GUID MUST BE UNIQUE PER PRODUCT -->
+  <?define PRODUCT_GUID="CE621A54-300B-4145-84F0-58050B627CB3"?>
+  <?define ACTIVESETUP_GUID={9DF23EAA-A775-4A52-9BA3-AC61B4B01AF6}?>
+
+  <!--Set the name of your dlls here-->
+  <?define XLL32="mySample-AddIn-packed.xll"?>
+  <?define XLL64="mySample-AddIn64-packed.xll"?>
+
+  <!--IMPORTANT ALL MS OFFICE SUPPORTED VERSIONS ARE HERE Office 2003, 2007, 2010, 2013, 2016
+    For further versions of excel you'll have to update the .wxs path check (grep EXCELSUPPORTEDVERSION in .wxs project) 
+  -->
+  <?define OFFICE_REG_KEYS="11.0,12.0,14.0,15.0,16.0"?>
+
+  <!--That is yours to complete-->
+  <?define SETUP_LANG="en-US" ?>
+  <?define PRODUCT_NAME="mySample" ?>
+  <?define PRODUCT_DESC="Installer for mySample Excel Add-In" ?>
+  <?define PRODUCT_SITE="https://www.mySample.com" ?>
+  <?define COMPANY_NAME="myCompany" ?>
+  <?define COPYRIGHT="(c) 2018 myCompany" ?>
+
+  <!--the .xll path that will be installed by the setup-->
+  <?define XLL_DIR_PATH="..\mySample\bin"?>
+  <!--the .dll file that will be used as product version source-->
+  <?define VER_DLL_FILE="..\mySample\bin\mySample.dll"?>
+  <!--the .ca.dll file that will be used on per user installation-->
+  <?define CA_USER_FILE="..\InstallerCA\bin\InstallerCA.CA.dll"?>
+  <!--the .ca.dll file that will be used on per machine installation-->
+  <?define CA_MACH_FILE="..\mySampleWiXSetupCA\bin\mySampleWiXSetupCA.CA.dll"?>
+  <!--the .exe path that will be executed by the active setup, -->
+  <?define CA_OPEN_PATH="..\manageOpenKey\bin"?>
+  <!--the .exe file that will be executed by the active setup, -->
+  <?define CA_OPEN_FILE="manageOpenKey.exe"?>
+
+  <!--END: check content and replace by yours-->
+</Include>

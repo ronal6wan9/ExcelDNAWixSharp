@@ -1,0 +1,11 @@
+//content: true
+framework: net35, net40
+lowest_matching: false
+redirects: on
+//references: strict
+source https://api.nuget.org/v3/index.json
+//storage: none
+strategy: max
+
+nuget ExcelDna.Integration
+nuget WixSharp

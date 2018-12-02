@@ -1,0 +1,10 @@
+REDIRECTS: ON
+STRATEGY: MAX
+LOWEST_MATCHING: FALSE
+RESTRICTION: || (== net35) (== net40)
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    ExcelDna.Integration (0.34.6)
+    WixSharp (1.9.3)
+      WixSharp.bin (>= 1.9.3)
+    WixSharp.bin (1.9.3)

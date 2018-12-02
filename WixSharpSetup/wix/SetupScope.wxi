@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <!-- Detect if at least one office excel has been found, to this aim use installation PATH -->
+  <!--EXCELSUPPORTEDVERSION-->
+  <Property Id="EXCEL2003INSTALLPATH" Secure="yes">
+    <RegistrySearch Id="OfficeExcel2003InstallPath64" Root="HKLM" Key="SOFTWARE\Microsoft\Office\11.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="yes" />
+    <RegistrySearch Id="OfficeExcel2003InstallPath32" Root="HKLM" Key="SOFTWARE\Microsoft\Office\11.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="no" />
+  </Property>
+  <Property Id="EXCEL2007INSTALLPATH" Secure="yes">
+    <RegistrySearch Id="OfficeExcel2007InstallPath64" Root="HKLM" Key="SOFTWARE\Microsoft\Office\12.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="yes" />
+    <RegistrySearch Id="OfficeExcel2007InstallPath32" Root="HKLM" Key="SOFTWARE\Microsoft\Office\12.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="no" />
+  </Property>
+  <Property Id="EXCEL2010INSTALLPATH" Secure="yes">
+    <RegistrySearch Id="OfficeExcel2010InstallPath64" Root="HKLM" Key="SOFTWARE\Microsoft\Office\14.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="yes" />
+    <RegistrySearch Id="OfficeExcel2010InstallPath32" Root="HKLM" Key="SOFTWARE\Microsoft\Office\14.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="no" />
+  </Property>
+  <Property Id="EXCEL2013INSTALLPATH" Secure="yes">
+    <RegistrySearch Id="OfficeExcel2013InstallPath64" Root="HKLM" Key="SOFTWARE\Microsoft\Office\15.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="yes" />
+    <RegistrySearch Id="OfficeExcel2013InstallPath32" Root="HKLM" Key="SOFTWARE\Microsoft\Office\15.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="no" />
+  </Property>
+  <Property Id="EXCEL2016INSTALLPATH" Secure="yes">
+    <RegistrySearch Id="OfficeExcel2016InstallPath64" Root="HKLM" Key="SOFTWARE\Microsoft\Office\16.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="yes" />
+    <RegistrySearch Id="OfficeExcel2016InstallPath32" Root="HKLM" Key="SOFTWARE\Microsoft\Office\16.0\Excel\InstallRoot" Name="Path" Type="raw" Win64="no" />
+  </Property>
+
+  <!--
+      it would be better to check if excel is trully installed (similar to what is done in manageOpenKey IsOfficeExcelInstalled)
+      it could be easily done using DirectorySearch + FileSearch BUT it cause issues with office 365 clickonce install which use 64bit program file to install 32 bits programs.
+      cause: msi engine rename "Program Files" to "Program Files (x86)" to any registry key read when using a 32bits msi, resulting in excel not found.
+      
+      todo: might be possible to do it using a custom action (would also be easier to maintain).
+    -->
+
+  <Condition Message="This setup requires Office Excel 2003 and/or 2007 and/or 2010 and/or 2013 and/or 2016 (32-bit or 64-bit).">
+    <![CDATA[Installed OR EXCEL2003INSTALLPATH OR EXCEL2007INSTALLPATH OR EXCEL2010INSTALLPATH OR EXCEL2013INSTALLPATH OR EXCEL2016INSTALLPATH]]>
+  </Condition>
+  
+  <!--IMPORTANT ALL MS OFFICE SUPPORTED VERSIONS ARE HERE: Office 2003, 2007, 2010, 2013, 2016 Keep it uptodate-->
+  <!-- these numbers will be parsed individually in the custom actions with InvariantCulture and NumberStyles.Any -->
+  <Property Id="OFFICEREGKEYS" Value="$(var.OFFICE_REG_KEYS)" />
+  <Property Id="XLL32" Value="$(var.XLL32)" />
+  <Property Id="XLL64" Value="$(var.XLL64)" />
+
+  <!-- The property below will disable the repair button. -->
+  <!--<Property Id="ARPNOREPAIR" Value="yes" />-->
+  <Property Id="PromptToCloseProcesses" Value="EXCEL" />
+  <Property Id="PromptToCloseDisplayNames" Value="Microsoft Excel" />
+
+  <!--command arguments to pass to .exe-->
+  <Property Id="CREATE_HKCU_OPEN_CMD" Value='/install "$(var.XLL32)" "$(var.XLL64)" $(var.OFFICE_REG_KEYS)' />
+  <Property Id="REMOVE_HKCU_OPEN_CMD" Value='/uninstall "$(var.XLL32)" "$(var.XLL64)" $(var.OFFICE_REG_KEYS)' />
+
+  <!--
+    To handle registering the XLL, a custom action project must be created and a project reference must be created. 
+    This project will create a DLL that WiX can understand.
+    The binary refers to the dll created by the custom action project.
+    If values are to be passed to the custom action project, the set property actions must precede the action specifying the DLL entry point.
+    The InstallExecuteSequence specifies the sequence to run the actions and the AdminExecuteSequence provide rights to non-admin users (to the registry).
+    For more information on custom actions, read
+    http://www.codeproject.com/Articles/132918/Creating-Custom-Action-for-WIX-Written-in-Managed?fid=1599130&df=90&mpp=25&noise=3&prof=False&sort=Position&view=Quick&spc=Relaxed&select=4131367&fr=1#xx0xx
+    -->
+
+  <!-- Custom Actions -->
+  <Binary Id="CA_USER_FILE" SourceFile="$(var.CA_USER_FILE)" />
+  <Binary Id="CA_MACH_FILE" SourceFile="$(var.CA_MACH_FILE)" />
+
+  <CustomAction Id="Action_RegisterAddIn.SetProperty" Return="check" Property="AddinFolder" Value="[INSTALLDIR]" />
+  <CustomAction Id="Action_RegisterAddIn" BinaryKey="CA_USER_FILE" DllEntry="CaRegisterAddIn" Return="check" Execute="immediate" />
+  <CustomAction Id="Action_UnRegisterAddIn.SetProperty" Return="check" Property="AddinFolder" Value="[INSTALLDIR]" />
+  <CustomAction Id="Action_UnRegisterAddIn" BinaryKey="CA_USER_FILE" DllEntry="CaUnRegisterAddIn" Return="check" Execute="immediate" />
+  <CustomAction Id="Action_CloseAppsPrompt" BinaryKey="CA_USER_FILE" DllEntry="ClosePrompt" Return="check" />
+
+  <!--These .Exe Custom action should not be impersonate to modify the current user HKCU-->
+  <!--This two custom actions (call a the .exe) are responsible for set/remove the HKCU key for the current user.-->
+  <CustomAction Id="Action_SetOPENHKCU_Cmd" Property="Action_SetOPENHKCU"  Execute="immediate" Value='"[INSTALLDIR]$(var.CA_OPEN_FILE)" [CREATE_HKCU_OPEN_CMD]' />
+  <CustomAction Id="Action_SetOPENHKCU" Return="check" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred"/>
+
+  <CustomAction Id="Action_RemoveOPENHKCU_Cmd" Property="Action_RemoveOPENHKCU"  Execute="immediate" Value='"[INSTALLDIR]$(var.CA_OPEN_FILE)" [REMOVE_HKCU_OPEN_CMD]'/>
+  <CustomAction Id="Action_RemoveOPENHKCU" Return="check" BinaryKey="WixCA"  DllEntry="WixQuietExec" Execute="deferred" />
+
+  <!--These C# Custom action should not be impersonate to modify the HKLM-->
+  <!--This custom action is used to set up the ActiveSetup HKLM key for install that uses the CREATE_HKCU_OPEN_CMD-->
+  <CustomAction Id="Action_ActiveSetup_SetHKLM.SetProperty" Return="check" Property="Action_ActiveSetup_SetHKLM" Value='CREATE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [CREATE_HKCU_OPEN_CMD];REMOVE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [REMOVE_HKCU_OPEN_CMD];ACTIVESETUP_GUID=$(var.ACTIVESETUP_GUID);VERSION=[ProductVersion];COMPANYNAME=$(var.COMPANY_NAME);PRODUCTNAME=$(var.PRODUCT_NAME)' />
+  <CustomAction Id="Action_ActiveSetup_SetHKLM" BinaryKey="CA_MACH_FILE" Impersonate="no" DllEntry="CaActiveSetup_SetHKLM" Return="check" Execute="commit" />
+
+  <!--This custom action  is used to set up the ActiveSetup HKLM key for uninstall that uses the REMOVE_HKCU_OPEN_CMD-->
+  <CustomAction Id="Action_ActiveSetup_RemoveHKLM.SetProperty" Return="check" Property="Action_ActiveSetup_RemoveHKLM" Value='CREATE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [CREATE_HKCU_OPEN_CMD];REMOVE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [REMOVE_HKCU_OPEN_CMD];ACTIVESETUP_GUID=$(var.ACTIVESETUP_GUID);VERSION=[ProductVersion];COMPANYNAME=$(var.COMPANY_NAME);PRODUCTNAME=$(var.PRODUCT_NAME)' />
+  <CustomAction Id="Action_ActiveSetup_RemoveHKLM" BinaryKey="CA_MACH_FILE" Impersonate="no" DllEntry="CaActiveSetup_RemoveHKLM" Return="check" Execute="commit" />
+
+  <!--These C# Custom action needs to be impersonate to modify the HKCU-->
+  <!--This custom action is used to set up the ActiveSetup HKCU key -->
+  <CustomAction Id="Action_ActiveSetup_SetHKCU.SetProperty" Return="check" Property="Action_ActiveSetup_SetHKCU" Value='CREATE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [CREATE_HKCU_OPEN_CMD];REMOVE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [REMOVE_HKCU_OPEN_CMD];ACTIVESETUP_GUID=$(var.ACTIVESETUP_GUID);VERSION=[ProductVersion];COMPANYNAME=$(var.COMPANY_NAME);PRODUCTNAME=$(var.PRODUCT_NAME)' />
+  <CustomAction Id="Action_ActiveSetup_SetHKCU" BinaryKey="CA_MACH_FILE" Impersonate="yes" DllEntry="CaActiveSetup_SetHKCU" Return="check" Execute="commit" />
+
+  <CustomAction Id="Action_ActiveSetup_RemoveHKCU.SetProperty" Return="check" Property="Action_ActiveSetup_RemoveHKCU" Value='CREATE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [CREATE_HKCU_OPEN_CMD];REMOVE_HKCU_OPEN_FULL="[INSTALLDIR]$(var.CA_OPEN_FILE)" [REMOVE_HKCU_OPEN_CMD];ACTIVESETUP_GUID=$(var.ACTIVESETUP_GUID);VERSION=[ProductVersion];COMPANYNAME=$(var.COMPANY_NAME);PRODUCTNAME=$(var.PRODUCT_NAME)' />
+  <CustomAction Id="Action_ActiveSetup_RemoveHKCU" BinaryKey="CA_MACH_FILE" Impersonate="yes" DllEntry="CaActiveSetup_RemoveHKCU" Return="check" Execute="commit" />
+
+  <!--Install Sequence-->
+  <InstallExecuteSequence>
+    <!--INSTALL (+ Repair and Upgrade)-->
+    <Custom Action="Action_CloseAppsPrompt" After="Action_RegisterAddIn.SetProperty"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_RegisterAddIn.SetProperty" Before="Action_RegisterAddIn"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_RegisterAddIn" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+
+    <Custom Action="Action_SetOPENHKCU_Cmd" Before="Action_SetOPENHKCU"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_SetOPENHKCU" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_SetHKLM.SetProperty" Before="Action_ActiveSetup_SetHKLM"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_SetHKLM" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_SetHKCU.SetProperty" Before="Action_ActiveSetup_SetHKCU"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_SetHKCU" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <!--UNINSTALL-->
+    <Custom Action="Action_UnRegisterAddIn.SetProperty" Before="Action_UnRegisterAddIn"><![CDATA[Installed AND REMOVE AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_UnRegisterAddIn" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS=""]]></Custom>
+
+    <Custom Action="Action_RemoveOPENHKCU_Cmd" Before="Action_RemoveOPENHKCU"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_RemoveOPENHKCU" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_RemoveHKLM.SetProperty" Before="Action_ActiveSetup_RemoveHKLM"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_RemoveHKLM" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_RemoveHKCU.SetProperty" Before="Action_ActiveSetup_RemoveHKCU"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_RemoveHKCU" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+  </InstallExecuteSequence>
+  <AdminExecuteSequence>
+    <!--INSTALL (+ Repair and Upgrade)-->
+    <Custom Action="Action_CloseAppsPrompt" After="Action_RegisterAddIn.SetProperty"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_RegisterAddIn.SetProperty" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_RegisterAddIn" After="Action_RegisterAddIn.SetProperty"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS=""]]></Custom>
+
+    <Custom Action="Action_SetOPENHKCU_Cmd" Before="Action_SetOPENHKCU"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_SetOPENHKCU" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_SetHKLM.SetProperty" Before="Action_ActiveSetup_SetHKLM"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_SetHKLM" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_SetHKCU.SetProperty" Before="Action_ActiveSetup_SetHKCU"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_SetHKCU" Before="InstallFinalize"><![CDATA[(NOT Installed OR UPGRADINGPRODUCTCODE OR (Installed AND NOT REMOVE)) AND ALLUSERS="1"]]></Custom>
+
+    <!--UNINSTALL-->
+    <Custom Action="Action_UnRegisterAddIn.SetProperty" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS=""]]></Custom>
+    <Custom Action="Action_UnRegisterAddIn" After="Action_UnRegisterAddIn.SetProperty"><![CDATA[Installed AND REMOVE AND ALLUSERS=""]]></Custom>
+
+    <Custom Action="Action_RemoveOPENHKCU_Cmd" Before="Action_RemoveOPENHKCU"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_RemoveOPENHKCU" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_RemoveHKLM.SetProperty" Before="Action_ActiveSetup_RemoveHKLM"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_RemoveHKLM" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+
+    <Custom Action="Action_ActiveSetup_RemoveHKCU.SetProperty" Before="Action_ActiveSetup_RemoveHKCU"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+    <Custom Action="Action_ActiveSetup_RemoveHKCU" Before="InstallFinalize"><![CDATA[Installed AND REMOVE AND ALLUSERS="1"]]></Custom>
+  </AdminExecuteSequence>
+</Include>
