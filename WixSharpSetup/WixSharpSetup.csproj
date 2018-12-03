@@ -85,7 +85,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <Choose>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v3.5' Or $(TargetFrameworkVersion) == 'v4.0')">
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v3.5'">
       <ItemGroup>
         <Reference Include="BootstrapperCore">
           <HintPath>..\packages\WixSharp.bin\lib\BootstrapperCore.dll</HintPath>

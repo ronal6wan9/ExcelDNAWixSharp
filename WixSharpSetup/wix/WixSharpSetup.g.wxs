@@ -17,28 +17,28 @@
         <Directory Id="ProgramFilesFolder.myCompany" Name="myCompany">
           <Directory Id="INSTALLDIR" Name="mySample">
 
-            <Component Id="Component.mySample_AddIn_packed.xll_366416943" Guid="ce621a54-300b-4145-84f0-5805f1a98b70">
-              <File Id="mySample_AddIn_packed.xll_366416943" Source="..\mySample\bin\mySample-AddIn-packed.xll" />
+            <Component Id="Component.mySample_AddIn_packed.xll_652545632" Guid="ce621a54-300b-4145-84f0-5805f8b72261">
+              <File Id="mySample_AddIn_packed.xll_652545632" Source="..\ExcelDNAWixInstallerLM\mySample\bin\Debug\mySample-AddIn-packed.xll" />
             </Component>
 
-            <Component Id="Component.mySample_AddIn64_packed.xll_355437538" Guid="ce621a54-300b-4145-84f0-58059669986b">
-              <File Id="mySample_AddIn64_packed.xll_355437538" Source="..\mySample\bin\mySample-AddIn64-packed.xll" />
+            <Component Id="Component.mySample_AddIn64_packed.xll_504514687" Guid="ce621a54-300b-4145-84f0-580596110748">
+              <File Id="mySample_AddIn64_packed.xll_504514687" Source="..\ExcelDNAWixInstallerLM\mySample\bin\Debug\mySample-AddIn64-packed.xll" />
             </Component>
 
-            <Component Id="Component.InstallerCA.CA.dll_1765867390" Guid="ce621a54-300b-4145-84f0-580564b205ed">
-              <File Id="InstallerCA.CA.dll_1765867390" Source="..\InstallerCA\bin\InstallerCA.CA.dll" />
+            <Component Id="Component.InstallerCA.CA.dll_1006814696" Guid="ce621a54-300b-4145-84f0-580521b889c7">
+              <File Id="InstallerCA.CA.dll_1006814696" Source="..\WiXInstaller\Source\InstallerCA\bin\Debug\InstallerCA.CA.dll" />
             </Component>
 
-            <Component Id="Component.mySampleWiXSetupCA.CA.dll_1545532920" Guid="ce621a54-300b-4145-84f0-58056d247ce8">
-              <File Id="mySampleWiXSetupCA.CA.dll_1545532920" Source="..\mySampleWiXSetupCA\bin\mySampleWiXSetupCA.CA.dll" />
+            <Component Id="Component.mySampleWiXSetupCA.CA.dll_1347328423" Guid="ce621a54-300b-4145-84f0-5805ed9d3830">
+              <File Id="mySampleWiXSetupCA.CA.dll_1347328423" Source="..\ExcelDNAWixInstallerLM\mySampleWiXSetupCA\bin\Debug\mySampleWiXSetupCA.CA.dll" />
             </Component>
 
-            <Component Id="Component.manageOpenKey.exe_358650790" Guid="ce621a54-300b-4145-84f0-5805eba9b8f4" Permanent="yes">
-              <File Id="manageOpenKey.exe_358650790" Source="..\manageOpenKey\bin\manageOpenKey.exe" />
+            <Component Id="Component.manageOpenKey.exe_1253657253" Guid="ce621a54-300b-4145-84f0-5805b1cb9711" Permanent="yes">
+              <File Id="manageOpenKey.exe_1253657253" Source="..\ExcelDNAWixInstallerLM\manageOpenKey\bin\Debug\manageOpenKey.exe" />
             </Component>
 
-            <Component Id="Component.README.txt_806620311" Guid="ce621a54-300b-4145-84f0-5805d80b509e">
-              <File Id="README.txt_806620311" Source="..\manageOpenKey\bin\README.txt" />
+            <Component Id="Component.README.txt_1174562826" Guid="ce621a54-300b-4145-84f0-5805ffd52eba">
+              <File Id="README.txt_1174562826" Source="..\ExcelDNAWixInstallerLM\manageOpenKey\bin\Debug\README.txt" />
             </Component>
 
           </Directory>
@@ -84,13 +84,13 @@
 
     <UIRef Id="WixUI_ErrorProgressText" />
 
-    <Property Id="AddinFolder" />
+    <Property Id="AddinFolder" Value="-" />
     <Property Id="WixSharp_UI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="UAC_REVEALER_ENABLED" Value="true" />
     <Property Id="UAC_WARNING" Value="Please wait for UAC prompt to appear.&#xD;&#xA;&#xD;&#xA;If it appears minimized then activate it from the taskbar." />
     <Property Id="WixSharp_InstallDialogs" Value="WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.WelcomeDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.LicenceDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.InstallScopeDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.ProgressDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.ExitDialog" />
     <Property Id="WixSharp_ModifyDialogs" Value="WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.MaintenanceTypeDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.ProgressDialog&#xA;WixSharp.UI, Version=1.9.3.0, Culture=neutral, PublicKeyToken=3775edd25acc43c2|WixSharp.UI.Forms.ExitDialog" />
-    <Property Id="WixSharp_UIInitialized_Handlers" Value="WixSharpSetup, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null|XLPicker.Wix.Program|Project_UIInitialized" />
+    <Property Id="WixSharp_UIInitialized_Handlers" Value="WixSharpSetup, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null|WixSharpSetup.Program|Project_UIInitialized" />
     <Property Id="ARPCOMMENTS" Value="$(var.PRODUCT_DESC)" />
     <Property Id="ARPCONTACT" Value="myCompany" />
     <Property Id="ARPHELPLINK" Value="$(var.PRODUCT_SITE)/support" />
@@ -100,12 +100,12 @@
     <Property Id="ARPURLUPDATEINFO" Value="$(var.PRODUCT_SITE)/update" />
 
     <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
-      <ComponentRef Id="Component.mySample_AddIn_packed.xll_366416943" />
-      <ComponentRef Id="Component.mySample_AddIn64_packed.xll_355437538" />
-      <ComponentRef Id="Component.InstallerCA.CA.dll_1765867390" />
-      <ComponentRef Id="Component.mySampleWiXSetupCA.CA.dll_1545532920" />
-      <ComponentRef Id="Component.manageOpenKey.exe_358650790" />
-      <ComponentRef Id="Component.README.txt_806620311" />
+      <ComponentRef Id="Component.mySample_AddIn_packed.xll_652545632" />
+      <ComponentRef Id="Component.mySample_AddIn64_packed.xll_504514687" />
+      <ComponentRef Id="Component.InstallerCA.CA.dll_1006814696" />
+      <ComponentRef Id="Component.mySampleWiXSetupCA.CA.dll_1347328423" />
+      <ComponentRef Id="Component.manageOpenKey.exe_1253657253" />
+      <ComponentRef Id="Component.README.txt_1174562826" />
     </Feature>
 
     <InstallExecuteSequence>

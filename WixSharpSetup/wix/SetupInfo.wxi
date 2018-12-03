@@ -26,15 +26,15 @@
   <?define COPYRIGHT="(c) 2018 myCompany" ?>
 
   <!--the .xll path that will be installed by the setup-->
-  <?define XLL_DIR_PATH="..\mySample\bin"?>
+  <?define XLL_DIR_PATH="..\ExcelDNAWixInstallerLM\mySample\bin\Debug"?>
   <!--the .dll file that will be used as product version source-->
-  <?define VER_DLL_FILE="..\mySample\bin\mySample.dll"?>
+  <?define VER_DLL_FILE="..\ExcelDNAWixInstallerLM\mySample\bin\Debug\mySample.dll"?>
   <!--the .ca.dll file that will be used on per user installation-->
-  <?define CA_USER_FILE="..\InstallerCA\bin\InstallerCA.CA.dll"?>
+  <?define CA_USER_FILE="..\WiXInstaller\Source\InstallerCA\bin\Debug\InstallerCA.CA.dll"?>
   <!--the .ca.dll file that will be used on per machine installation-->
-  <?define CA_MACH_FILE="..\mySampleWiXSetupCA\bin\mySampleWiXSetupCA.CA.dll"?>
+  <?define CA_MACH_FILE="..\ExcelDNAWixInstallerLM\mySampleWiXSetupCA\bin\Debug\mySampleWiXSetupCA.CA.dll"?>
   <!--the .exe path that will be executed by the active setup, -->
-  <?define CA_OPEN_PATH="..\manageOpenKey\bin"?>
+  <?define CA_OPEN_PATH="..\ExcelDNAWixInstallerLM\manageOpenKey\bin\Debug"?>
   <!--the .exe file that will be executed by the active setup, -->
   <?define CA_OPEN_FILE="manageOpenKey.exe"?>
 

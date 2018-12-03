@@ -32,7 +32,7 @@ namespace WixSharpSetup
                     new File($@"{info.Text("CA_MACH_FILE")}"),
                     new File($@"{caOpenPath}\{info.Text("CA_OPEN_FILE")}").Permanent(),
                     new File($@"{caOpenPath}\README.txt")),
-                new Property("AddinFolder", "")
+                new Property("AddinFolder", "-")
             );
             project.AddXmlInclude(@"wix\SetupInfo.wxi");
             project.AddXmlInclude(@"wix\SetupScope.wxi");
