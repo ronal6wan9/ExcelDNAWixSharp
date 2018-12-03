@@ -1,0 +1,6 @@
+[submodule "WiXInstaller"]
+	path = WiXInstaller
+	url = https://github.com/Excel-DNA/WiXInstaller
+[submodule "ExcelDNAWixInstallerLM"]
+	path = ExcelDNAWixInstallerLM
+	url = https://github.com/bpatra/ExcelDNAWixInstallerLM
